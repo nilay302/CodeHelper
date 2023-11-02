@@ -3,7 +3,6 @@ from main.extraMethods import userDetails, convertUnixTime, getTags, contestDeta
 
 # Create your views here.
 
-
 def index(request):
     return render(request, 'login.html', {'giveError': False})
 

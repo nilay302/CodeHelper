@@ -77,45 +77,78 @@ def getTags(codeforcesHandle, rank):
                     wrongSubmissions[tags] += 1
         else:
             completedProblems[problem['problem']['name']] = 1
+    
+    req_problem_tags = []
+    for tags in sorted(wrongSubmissions.items(), key=lambda x: x[1], reverse=True):
+        req_problem_tags.append(tags[0])
+        if(len(req_problem_tags) == 2):
+            break
+
     weakTags = {}
     minSolvedCount = 0
-    maxSolvedCount = 35000
+    if(rank < 1000):
+        minSolvedCount = 17000
+        req_problem_tags.append('brute force')
+        req_problem_tags.append('sorting')
+        req_problem_tags.append('math')
     if(rank < 1200):
         minSolvedCount = 15000
-        maxSolvedCount = 18000
+        req_problem_tags.append('sorting')
+        req_problem_tags.append('math')
+        req_problem_tags.append('greedy')
+        req_problem_tags.append('implementation')
+        req_problem_tags.append('constructive algorithms')
     elif(rank < 1400):
         minSolvedCount = 10000
-        maxSolvedCount = 16000
+        req_problem_tags.append('number theory')
+        req_problem_tags.append('greedy')
+        req_problem_tags.append('constructive algorithms')
+        req_problem_tags.append('binary search')
     elif(rank < 1600):
         minSolvedCount = 9000
-        maxSolvedCount = 14000
+        req_problem_tags.append('strings')
+        req_problem_tags.append('binary search')
+        req_problem_tags.append('dp')
+        req_problem_tags.append('combinatorics')
     elif(rank < 1900):
         minSolvedCount = 9000
-        maxSolvedCount = 12000
+        req_problem_tags.append('dp')
+        req_problem_tags.append('graphs')
+        req_problem_tags.append('trees')
+        req_problem_tags.append('dfs and similar')
     elif(rank < 2100):
-        minSolvedCount = 8000
-        maxSolvedCount = 10000
-    elif(rank < 2400):
         minSolvedCount = 5000
-        maxSolvedCount = 7000
+        req_problem_tags.append('dp')
+        req_problem_tags.append('graphs')
+        req_problem_tags.append('trees')
+        req_problem_tags.append('dfs and similar')
+    elif(rank < 2400):
+        minSolvedCount = 2000
+        req_problem_tags.append('dp')
+        req_problem_tags.append('graphs')
+        req_problem_tags.append('fft')
+        req_problem_tags.append('geometry')
     elif(rank < 2600):
-        minSolvedCount = 3000
-        maxSolvedCount = 5000
-    elif(rank < 3000):
         minSolvedCount = 1000
-        maxSolvedCount = 3000
+        req_problem_tags.append('dp')
+        req_problem_tags.append('graphs')
+        req_problem_tags.append('trees')
+        req_problem_tags.append('dfs and similar')
     else:
         minSolvedCount = 0
-        maxSolvedCount = 2000
-    for tags in sorted(wrongSubmissions.items(), key=lambda x: x[1], reverse=True):
-        weakTags[tags[0]] = getProblems(
-            tags[0], rank, minSolvedCount, maxSolvedCount)
-        if(len(weakTags) == 4):
+        req_problem_tags.append('dp')
+        req_problem_tags.append('graphs')
+        req_problem_tags.append('trees')
+        req_problem_tags.append('dfs and similar')
+    
+    for tag in req_problem_tags:
+        weakTags[tag] = getProblems(tag, rank, minSolvedCount)
+        if(len(weakTags) == 7):
             break
     return weakTags
 
 
-def getProblems(tag, rank, minSolvedCount, maxSolvedCount):
+def getProblems(tag, rank, minSolvedCount):
     problems = []
     url = requests.get(
         'https://codeforces.com/api/problemset.problems?tags='+tag)
@@ -137,7 +170,7 @@ def getProblems(tag, rank, minSolvedCount, maxSolvedCount):
         elif (allProblems[i]['index'] == 'A'):
             continue
         if tag in allProblems[i]['tags']:
-            if((allProblems[i]['name'] not in alreadySuggested) and (allProblems[i]['name'] not in completedProblems) and allproblemStatistics[i]['solvedCount'] >= minSolvedCount and allproblemStatistics[i]['solvedCount'] <= maxSolvedCount):
+            if((allProblems[i]['name'] not in alreadySuggested) and (allProblems[i]['name'] not in completedProblems)):
                 alreadySuggested[allProblems[i]['name']] = 1
                 tempList = []
                 tempList.append(allProblems[i]['name'])
