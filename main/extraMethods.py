@@ -85,70 +85,62 @@ def getTags(codeforcesHandle, rank):
             break
 
     weakTags = {}
-    minSolvedCount = 0
+    min_rating = rank - 100
+    max_rating = rank + 300
     if(rank < 1000):
-        minSolvedCount = 17000
         req_problem_tags.append('brute force')
         req_problem_tags.append('sorting')
         req_problem_tags.append('math')
     if(rank < 1200):
-        minSolvedCount = 15000
         req_problem_tags.append('sorting')
         req_problem_tags.append('math')
         req_problem_tags.append('greedy')
         req_problem_tags.append('implementation')
         req_problem_tags.append('constructive algorithms')
     elif(rank < 1400):
-        minSolvedCount = 10000
         req_problem_tags.append('number theory')
         req_problem_tags.append('greedy')
         req_problem_tags.append('constructive algorithms')
         req_problem_tags.append('binary search')
     elif(rank < 1600):
-        minSolvedCount = 9000
         req_problem_tags.append('strings')
         req_problem_tags.append('binary search')
         req_problem_tags.append('dp')
         req_problem_tags.append('combinatorics')
     elif(rank < 1900):
-        minSolvedCount = 9000
         req_problem_tags.append('dp')
         req_problem_tags.append('graphs')
         req_problem_tags.append('trees')
         req_problem_tags.append('dfs and similar')
     elif(rank < 2100):
-        minSolvedCount = 5000
         req_problem_tags.append('dp')
         req_problem_tags.append('graphs')
         req_problem_tags.append('trees')
         req_problem_tags.append('dfs and similar')
     elif(rank < 2400):
-        minSolvedCount = 2000
         req_problem_tags.append('dp')
         req_problem_tags.append('graphs')
         req_problem_tags.append('fft')
         req_problem_tags.append('geometry')
     elif(rank < 2600):
-        minSolvedCount = 1000
         req_problem_tags.append('dp')
         req_problem_tags.append('graphs')
         req_problem_tags.append('trees')
         req_problem_tags.append('dfs and similar')
     else:
-        minSolvedCount = 0
         req_problem_tags.append('dp')
         req_problem_tags.append('graphs')
         req_problem_tags.append('trees')
         req_problem_tags.append('dfs and similar')
     
     for tag in req_problem_tags:
-        weakTags[tag] = getProblems(tag, rank, minSolvedCount)
+        weakTags[tag] = getProblems(tag, rank, min_rating, max_rating)
         if(len(weakTags) == 7):
             break
     return weakTags
 
 
-def getProblems(tag, rank, minSolvedCount):
+def getProblems(tag, rank, min_rating, max_rating):
     problems = []
     url = requests.get(
         'https://codeforces.com/api/problemset.problems?tags='+tag)
@@ -170,7 +162,11 @@ def getProblems(tag, rank, minSolvedCount):
         elif (allProblems[i]['index'] == 'A'):
             continue
         if tag in allProblems[i]['tags']:
-            if((allProblems[i]['name'] not in alreadySuggested) and (allProblems[i]['name'] not in completedProblems)):
+            if((allProblems[i]['name'] not in alreadySuggested) 
+            and (allProblems[i]['name'] not in completedProblems)
+            and (allProblems[i].get('rating', 0) >= min_rating)
+            and (allProblems[i].get('rating', 0) <= max_rating)
+            ):
                 alreadySuggested[allProblems[i]['name']] = 1
                 tempList = []
                 tempList.append(allProblems[i]['name'])
